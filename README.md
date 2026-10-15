@@ -1,10 +1,41 @@
 # Tabview
 
-Allows to use hidden tabs
+Allows to edit multiple tabs independantly.
 
-# Commands
+**Caution**: consumes new windows if it haven't assigned `owner` property
 
-- `:nexttab`
-- `:prevtab`
-- `:tabcount`
-- `:closetab`
+# Available commands
+
+- `:open <filename>` creates new tab. (Override)
+- `:nexttab` opens next tab
+- `:prevtab` opens previous tab. Tabs is cycled
+- `:tabcount` shows tab count. Duplicate proofed
+- `:closetab` closes current tab, cancelling changes
+  - Don't forget to save it.
+# Events
+
+## `TabView`.events.TAB_OPEN
+
+*also known as `tab_open(filepath)`*
+
+Emit to open tab. Alternative call: `TabView`.`tab_open(filepath)`
+
+## `TabView`.events.TAB_CLOSE
+
+*also known as `tab_close(idx)`*
+
+Emit to close tab with index. Alternative call: **`WIP`**
+
+# Dependants
+
+## [TreeView](https://github.com/stalker57241/treeview)
+
+- Optional
+
+Now file selection opens a new tab.
+
+# Future ideas
+
+- [ ] Add `:wt <filename|idx>` to save changes fpr specified tab
+- [ ] Add `:wtall` to save all changes for tabs.
+- [ ] Add tabs for each window
