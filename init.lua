@@ -105,7 +105,10 @@ function module.init()
 		win:close()
 		opentab(#module.index)
 		return true
-	end)
+	end, 1)
+	vis.events.subscribe(module.events.TAB_CLOSE, function(idx)
+		closetab(idx)
+	end, 1)
 	vis.events.subscribe(vis.events.WIN_CLOSE, function(win) if win == module.win and win ~= nil then return true end end, 1)
 	vis.events.subscribe(vis.events.WIN_OPEN, function(win)
 		if win == nil then
