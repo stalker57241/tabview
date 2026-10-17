@@ -15,6 +15,7 @@ local _ENV = setmetatable(env, mt)
 
 local module = {
 	win = nil,
+	activeidx = nil,
 	idx = 0,
 	files = {}, -- id: tempfile
 	index = {}, -- id: path
@@ -30,6 +31,11 @@ end
 local function opentab(idx)
 	if #module.index == 1 then return end
 	if idx ~= nil then module.idx = idx - 1 end
+	if module.activeidx ~= nil then
+		module.files[module.activeidx + 1]:close()
+		module.files[module.activeidx + 1] = io.tmpfile()
+		module.files[module.activeidx + 1]:write(module.win.file:content(0, module.win.file.size))
+	end
 	module.win.file = module.index[module.idx + 1]
 	module.win.file:delete(0, module.win.file.size)
 	vis:info("path: " .. module.index[module.idx + 1])
@@ -37,6 +43,7 @@ local function opentab(idx)
 	temp:seek("set", 0)
 	local text = temp:read("*a")
 	module.win.file:insert(0, text)
+	module.activeidx = module.idx
 end
 local function closetab(idx)
 	if #module.index == 1 then
