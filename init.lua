@@ -29,23 +29,14 @@ local function showcount()
 end
 local function opentab(idx)
 	if #module.index == 1 then return end
-	if idx == nil then
-		module.win.file = module.index[module.idx + 1]
-		module.win.file:delete(0, module.win.file.size)
-		vis:info("path: " .. module.index[module.idx + 1])
-		local temp = module.files[module.idx + 1]
-		temp:seek("set", 0)
-		local text = temp:read("*a")
-		module.win.file:insert(0, text)
-	else 
-		module.win.file = module.index[idx]
-		module.win.file:delete(0, module.win.file.size)
-		vis:info("path: " .. module.index[idx])
-		local temp = module.files[idx]
-		temp:seek("set", 0)
-		local text = temp:read("*a")
-		module.win.file:insert(0, text)
-	end	
+	if idx ~= nil then module.idx = idx - 1 end
+	module.win.file = module.index[module.idx + 1]
+	module.win.file:delete(0, module.win.file.size)
+	vis:info("path: " .. module.index[module.idx + 1])
+	local temp = module.files[module.idx + 1]
+	temp:seek("set", 0)
+	local text = temp:read("*a")
+	module.win.file:insert(0, text)
 end
 local function closetab(idx)
 	if #module.index == 1 then
