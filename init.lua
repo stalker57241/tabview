@@ -62,6 +62,7 @@ local function closetab(idx)
 		table.remove(module.files, module.idx + 1)
 		module.idx = module.idx - 1
 	end
+	opentab()
 end
 local function nexttab()
 	module.idx = (module.idx + 1) % #module.index
@@ -77,14 +78,19 @@ local function storefile(file)
 	module.files[#module.index] = tmpfile
 	vis:info("Tabs: " .. #module.index)
 end
-local function openfile(filename)
+local function findfile(filename)
 	for idx = 1, #module.index do
 		if module.index[idx] == filename then
-			opentab(idx)
-			return true
+			return idx
 		end
 	end
-	return false
+	return nil
+end
+local function openfile(filename)
+	local idx = findfile(filename)
+	if idx == nil then return false end
+	opentab(idx)
+	return true
 end
 function module.init()
 	vis:command_register("tabcount", function() showcount() end)
@@ -134,6 +140,17 @@ function module.init()
 end
 function module.tab_open(filename)
 	vis.events.emit(module.events.TAB_OPEN, filename)
+end
+function module.tab_close(arg) -- if arg is number it just
+	local idx = nil
+	if type(arg) == "string" then
+		idx = findfile(arg)
+	elseif type(arg) == "number" then idx = arg
+	else
+		vis.events.emit(module.events.TAB_CLOSE)
+		return
+	end
+	vis.events.emit(module.events.TAB_CLOSE, idx)
 end
 function module.terminate()
 	for i = 1,#module.index do
