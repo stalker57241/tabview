@@ -80,4 +80,4 @@ Now file selection opens a new tab.
 
 # For developers
 
-API available [`here`](https://github.com/stalker57241/tabview/blob/c8adf240e21880c6c222c7d23d77626d12c686c3/API.md)
+API available [`here`](https://github.com/stalker57241/tabview/blob/general/API.md)
