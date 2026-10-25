@@ -40,7 +40,7 @@ local function opentab(index)
 	end
 	activewin.file = fileindex[idx + 1]
 	activewin.file:delete(0, activewin.file.size)
-	vis:info("path: " .. fileindex[idx + 1])
+--	vis:info("path: " .. fileindex[idx + 1])
 	local temp = files[idx + 1]
 	temp:seek("set", 0)
 	local text = temp:read("*a")
@@ -98,7 +98,7 @@ local function storefile(file)
 	tmpfile:write(file:content(0, file.size))
 	fileindex[#fileindex + 1] = file.path
 	files[#fileindex] = tmpfile
-	vis:info("Tabs: " .. #fileindex)
+--	vis:info("Tabs: " .. #fileindex)
 end
 local function findfile(filename)
 	for idx = 1, #fileindex do
@@ -163,10 +163,10 @@ function module.init()
 	end)
 end
 function module.get_tab_name_at(index)
-	if index ~= nil and tab >= 0 and tab < #fileindex then
+	if index ~= nil and index > 0 and index <= #fileindex then
 		return fileindex[index]
 	end
-	return nil
+	return "nil"
 end
 function module.get_active_tab()
 	return activeidx
