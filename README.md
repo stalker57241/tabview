@@ -4,6 +4,10 @@ Allows to edit multiple tabs independantly.
 
 **Caution**: consumes new windows if it haven't assigned `owner` property
 
+# Frontend
+
+Available at [tabdisplay](https://github.com/stalker57241/tabdisplay). 
+
 # Available commands
 
 - `:open <filename>` creates new tab. (Override)
