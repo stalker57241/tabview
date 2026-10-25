@@ -174,6 +174,9 @@ end
 function module.get_tab_count()
 	return #fileindex
 end
+function module.active_window()
+	return activewin
+end
 -- If index == nil then open new tab
 function module.tab_open(filename, index)
 	if index ~= nil then
