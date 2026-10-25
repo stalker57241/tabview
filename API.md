@@ -107,5 +107,5 @@ There is mine tab mappings for this plugin
 vis:map(vis.modes.NORMAL, "th", function() vis:command("prevtab") end)
 vis:map(vis.modes.NORMAL, "tl", function() vis:command("nexttab") end)
 -- Closes tab, like :q!
-vis:map(vis.modes.NORMAL, "tq", function() vis:command("closetab") end)
+vis:map(vis.modes.NORMAL, "th", function() vis:command("closetab") end)
 ```
