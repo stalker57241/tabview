@@ -13,72 +13,96 @@ local env, mt = {}, {
 }
 local _ENV = setmetatable(env, mt)
 
+local activewin = nil -- activewin
+local activeidx = nil -- display cursor
+local idx = 0 -- real cursor
+local files = {} -- id: tempfile
+local fileindex = {} -- id: path
+
 local module = {
-	win = nil,
-	activeidx = nil,
-	idx = 0,
-	files = {}, -- id: tempfile
-	index = {}, -- id: path
 	events = {
-		TAB_OPEN = "tab_open",
-		TAB_CLOSE = "tab_close"
+		TAB_OPEN = "tab_open", -- tab_open(filename)
+		TAB_REPLACE = "tab_replace", -- tab_replace(filename, idx)
+		TAB_CLOSE = "tab_close" -- tab_close(idx)
 	}
 }
 
 local function showcount()
-	vis:info("Opened tabs: " .. #module.files)
+	vis:info("Opened tabs: " .. #files)
 end
-local function opentab(idx)
-	if #module.index == 1 then return end
-	if idx ~= nil then module.idx = idx - 1 end
-	if module.activeidx ~= nil then
-		module.files[module.activeidx + 1]:close()
-		module.files[module.activeidx + 1] = io.tmpfile()
-		module.files[module.activeidx + 1]:write(module.win.file:content(0, module.win.file.size))
+local function opentab(index)
+	if #fileindex == 1 then return end
+	if index ~= nil then idx = index - 1 end
+	if activeidx ~= nil then
+		files[activeidx + 1]:close()
+		files[activeidx + 1] = io.tmpfile()
+		files[activeidx + 1]:write(activewin.file:content(0, activewin.file.size))
 	end
-	module.win.file = module.index[module.idx + 1]
-	module.win.file:delete(0, module.win.file.size)
-	vis:info("path: " .. module.index[module.idx + 1])
-	local temp = module.files[module.idx + 1]
+	activewin.file = fileindex[idx + 1]
+	activewin.file:delete(0, activewin.file.size)
+--	vis:info("path: " .. fileindex[idx + 1])
+	local temp = files[idx + 1]
 	temp:seek("set", 0)
 	local text = temp:read("*a")
-	module.win.file:insert(0, text)
-	module.activeidx = module.idx
+	activewin.file:insert(0, text)
+	activeidx = idx
 end
-local function closetab(idx)
-	if #module.index == 1 then
+local function closetab(index)
+	if #fileindex == 1 then
 		vis:exit(0)
 	end
-	if idx ~= nil then
-		module.files[idx]:close()
-		table.remove(module.index, idx)
-		table.remove(module.files, idx)
-		if module.idx >= idx then module.idx = module.idx - 1 end
+	if index ~= nil then
+		files[index]:close()
+		table.remove(fileindex, idx)
+		table.remove(files, idx)
+		if idx >= index then idx = idx - 1 end
 	else
-		module.files[module.idx + 1]:close()
-		table.remove(module.index, module.idx + 1)
-		table.remove(module.files, module.idx + 1)
-		module.idx = module.idx - 1
+		files[idx + 1]:close()
+		table.remove(fileindex, idx + 1)
+		table.remove(files, idx + 1)
+		idx = idx - 1
 	end
 	opentab()
 end
+local function replacetab(index, filename)
+	if index == nil or index <= 0 or index > #fileindex then
+		return
+	end
+	files[index]:close()
+	fileindex[index] = nil
+	files[index] = nil
+	if filename == nil then
+		vis:command("new")
+	else 
+		vis:command("open " .. filename)
+	end
+	local win = vis.win
+	local file = win.file
+	local path = file.path
+	local temp = io.tmpfile()
+	temp:write(file:content(0, file.size))
+	vis:close(win)
+	fileindex[index] = path
+	files[index] = temp
+	opentab()
+end
 local function nexttab()
-	module.idx = (module.idx + 1) % #module.index
+	idx = (idx + 1) % #fileindex
 end
 local function prevtab()
-	module.idx = (module.idx - 1) % #module.index
+	idx = (idx - 1) % #fileindex
 end
 
 local function storefile(file)
 	local tmpfile = io.tmpfile()
 	tmpfile:write(file:content(0, file.size))
-	module.index[#module.index + 1] = file.path
-	module.files[#module.index] = tmpfile
-	vis:info("Tabs: " .. #module.index)
+	fileindex[#fileindex + 1] = file.path
+	files[#fileindex] = tmpfile
+--	vis:info("Tabs: " .. #fileindex)
 end
 local function findfile(filename)
-	for idx = 1, #module.index do
-		if module.index[idx] == filename then
+	for idx = 1, #fileindex do
+		if fileindex[idx] == filename then
 			return idx
 		end
 	end
@@ -107,53 +131,75 @@ function module.init()
 		local win = vis.win
 		storefile(win.file)
 		win:close()
-		opentab(#module.index)
+		opentab(#fileindex)
 		return true
 	end, 1)
-	vis.events.subscribe(module.events.TAB_CLOSE, function(idx)
-		closetab(idx)
+	vis.events.subscribe(module.events.TAB_REPLACE, function(index, filename)
+		replacetab(index, filename)
 	end, 1)
-	vis.events.subscribe(vis.events.WIN_CLOSE, function(win) if win == module.win and win ~= nil then return true end end, 1)
+	vis.events.subscribe(module.events.TAB_CLOSE, function(index)
+		closetab(index)
+	end, 1)
+	vis.events.subscribe(vis.events.WIN_CLOSE, function(win) if win == activewin and win ~= nil then return true end end, 1)
 	vis.events.subscribe(vis.events.WIN_OPEN, function(win)
 		if win == nil then
 			return false
 		end
-		if module.win == nil then
+		if activewin == nil then
 			storefile(win.file)
-			module.win = win
+			activewin = win
 			return true
 		end
-		if win == module.win then
+		if win == activewin then
 			vis:info("It's already active window")
 			return false
 		end
 		if win.owner == nil then return false end
 		if win.owner ~= "tabview" then
 			storefile(win.file)
-			module.win.file = win.file
+			activewin.file = win.file
 			win:close()
---			vis:info("Tab added: " .. module.win.file.name)
 		end
 	end)
 end
-function module.tab_open(filename)
-	vis.events.emit(module.events.TAB_OPEN, filename)
+function module.get_tab_name_at(index)
+	if index ~= nil and index > 0 and index <= #fileindex then
+		return fileindex[index]
+	end
+	return "nil"
+end
+function module.get_active_tab()
+	return activeidx
+end
+function module.get_tab_count()
+	return #fileindex
+end
+function module.active_window()
+	return activewin
+end
+-- If index == nil then open new tab
+function module.tab_open(filename, index)
+	if index ~= nil then
+		vis.events.emit(module.events.TAB_REPLACE, index, filename)
+	else
+		vis.events.emit(module.events.TAB_OPEN, filename)
+	end
 end
 function module.tab_close(arg) -- if arg is number it just
-	local idx = nil
+	local index = nil
 	if type(arg) == "string" then
-		idx = findfile(arg)
-	elseif type(arg) == "number" then idx = arg
+		index = findfile(arg)
+	elseif type(arg) == "number" then index = arg
 	else
 		vis.events.emit(module.events.TAB_CLOSE)
 		return
 	end
-	vis.events.emit(module.events.TAB_CLOSE, idx)
+	vis.events.emit(module.events.TAB_CLOSE, index)
 end
 function module.terminate()
-	for i = 1,#module.index do
-		vis:message("File " .. module.index[i] .. "Closing")
-		module.files[module.index[i]]:close()
+	for i = 1,#fileindex do
+		vis:message("File " .. fileindex[i] .. "Closing")
+		files[fileindex[i]]:close()
 	end
 end
 
