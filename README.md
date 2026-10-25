@@ -4,32 +4,38 @@ Allows to edit multiple tabs independantly.
 
 **Caution**: consumes new windows if it haven't assigned `owner` property
 
+# Installation & Usage
+
+To download it:
+
+```sh
+git clone https://github.com/stalker57241/tabview ~/.config/vis/plugins/tabview
+```
+
+## Usage
+
+Add to `visrc.lua`
+```lua
+local tabview = require('plugins/tabview')
+-- If installed throw vis-plug
+local tabview = plug.plugins.tabview
+
+vis.events.subscribe(vis.events.INIT, function()
+  tabview.init()
+end)
+```
+
 # Frontend
 
-Available at [tabdisplay](https://github.com/stalker57241/tabdisplay). 
+Available at [TabDisplay](https://github.com/stalker57241/tabdisplay). 
 
 # Available commands
 
-- `:open <filename>` creates new tab. (Override)
-- `:nexttab` opens next tab
-- `:prevtab` opens previous tab. Tabs is cycled
-- `:tabcount` shows tab count. Duplicate proofed
+- `:open <filename>` creates new tab. *Overriden*
+- `:nexttab` / `:prevtab`: opens next/previous tab. Tabs is cycled
+- `:tabcount` shows tab count. Duplicate proof
 - `:closetab` closes current tab, cancelling changes
-  - Don't forget to save it.
-
-# Events
-
-## `TabView`.events.TAB_OPEN
-
-*also known as `tab_open(filepath)`*
-
-Emit to open tab, and emits when tab opened. Alternative call: `TabView`.`tab_open(filepath)`
-
-## `TabView`.events.TAB_CLOSE
-
-*also known as `tab_close(idx)`*
-
-Emit to close tab with index, and emits when that tab closed. Alternative call: **`WIP`**
+  - Don't forget to save them.
 
 # Recommendations
 
@@ -47,14 +53,31 @@ vis:map(vis.modes.NORMAL, "<C-t>q!", function() vis:command("closetab") end)
 
 # Dependants
 
-## [TreeView](https://github.com/stalker57241/treeview)
+### Marks:
+- *Optional*: Optionally depends of this plugin
+- *Required*: Depends of this plugin
 
-- Optional
+## [`TabDisplay`](https://github.com/stalker57241/tabdisplay)
 
+- *Required*
+
+**Changes**:
+Adds ui for listing tabs, using `API`
+
+## [`TreeView`](https://github.com/stalker57241/treeview)
+
+- *Optional*
+
+**Changes**:
 Now file selection opens a new tab.
 
 # Future ideas
 
+- [X] Add frontend for this plugin ([`TabDisplay`](https://github.com/stalker57241/tabdisplay))
 - [ ] Add `:wt <filename|idx>` to save changes fpr specified tab
 - [ ] Add `:wtall` to save all changes for tabs.
 - [ ] Add tabs for each window
+
+# For developers
+
+API available [`here`](https://github.com/stalker57241/tabview/blob/c8adf240e21880c6c222c7d23d77626d12c686c3/API.md)
