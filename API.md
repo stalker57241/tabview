@@ -25,7 +25,9 @@ Opens new tab
 **Arguments**:
 
 - `filename`: `string` - filename to open
-- `index`: `number` | `nil` - index tab to replace. When nil - opens new tab
+- `index`:
+  - `number`- Replace `index` tab
+  - `nil` - Open new tab
 
 ### `tabview.tab_close(arg)`
 
@@ -92,9 +94,11 @@ Get tab name
 
 **Arguments**:
 - `index`: `number` | `nil`
-  - `number`:
-  - `nil`:
+  - `number`: returns name of `index` tab
+  - `nil`: returns name of current tab
+
 **Returns**:
+
 - `string` - tab name (Full path, or whatever you pass to open this tab)
 - `nil` - tab not found
 
@@ -107,5 +111,5 @@ There is mine tab mappings for this plugin
 vis:map(vis.modes.NORMAL, "th", function() vis:command("prevtab") end)
 vis:map(vis.modes.NORMAL, "tl", function() vis:command("nexttab") end)
 -- Closes tab, like :q!
-vis:map(vis.modes.NORMAL, "th", function() vis:command("closetab") end)
+vis:map(vis.modes.NORMAL, "tq", function() vis:command("closetab") end)
 ```
