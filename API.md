@@ -8,6 +8,15 @@ Initializes `tabview`
 
 **Caution**: Awaiting to call from `vis.events.INIT`
 
+**Example**:
+
+```lua
+vis.events.subscribe(vis.events.INIT, function()
+  tabview.init()
+end)
+```
+
+
 ### `tabview.terminate()`
 
 Closes all tabs
@@ -17,8 +26,8 @@ Closes all tabs
 **Example**:
 
 ```lua
-vis.events.subscribe(vis.events.INIT, function()
-  tabview.init()
+vis.events.subscribe(vis.events.QUIT, function()
+  tabview.terminate()
 end)
 ```
 
