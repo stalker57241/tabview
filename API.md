@@ -8,6 +8,12 @@ Initializes `tabview`
 
 **Caution**: Awaiting to call from `vis.events.INIT`
 
+### `tabview.terminate()`
+
+Closes all tabs
+
+**Caution**: required to call from `vis.events.QUIT`
+
 **Example**:
 
 ```lua
