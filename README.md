@@ -25,9 +25,11 @@ vis.events.subscribe(vis.events.INIT, function()
 end)
 ```
 
-# Frontend
+# Frontends
 
-Available at [TabDisplay](https://github.com/stalker57241/tabdisplay). 
+- [TabDisplay](https://github.com/stalker57241/tabdisplay)
+
+If you created your own frontend for `tabview`, pr here adding link to bottom of this list.
 
 # Available commands
 
