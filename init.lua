@@ -130,7 +130,9 @@ function module.init()
 		vis:command("open " .. filename)
 		local win = vis.win
 		storefile(win.file)
-		win:close()
+		if win == activewin then
+			win:close()
+		end
 		opentab(#fileindex)
 		return true
 	end, 1)
@@ -140,7 +142,14 @@ function module.init()
 	vis.events.subscribe(module.events.TAB_CLOSE, function(index)
 		closetab(index)
 	end, 1)
-	vis.events.subscribe(vis.events.WIN_CLOSE, function(win) if win == activewin and win ~= nil then return true end end, 1)
+	vis.events.subscribe(vis.events.WIN_CLOSE, function(win) 
+		if win == activewin then
+			activewin = nil
+		end
+		if win == activewin and win ~= nil then
+			return true
+		end
+	end, 1)
 	vis.events.subscribe(vis.events.WIN_OPEN, function(win)
 		if win == nil then
 			return false
