@@ -20,6 +20,7 @@ local files = {} -- id: tempfile
 local fileindex = {} -- id: path
 
 local module = {
+	meta = generate_meta("tabview", "1.0.0"),
 	events = {
 		TAB_OPEN = "tab_open", -- tab_open(filename)
 		TAB_REPLACE = "tab_replace", -- tab_replace(filename, idx)
